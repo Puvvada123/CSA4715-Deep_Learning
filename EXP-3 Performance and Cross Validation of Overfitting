@@ -1,0 +1,34 @@
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+model = LogisticRegression(max_iter=1000)
+
+cv_results = cross_validate(model, X_train_scaled, y_train, cv=5, return_train_score=True)
+
+train_scores = cv_results['train_score']
+val_scores = cv_results['test_score']
+
+print("Training scores:", train_scores)
+print("Validation scores:", val_scores)
+
+mean_train_score = np.mean(train_scores)
+mean_val_score = np.mean(val_scores)
+std_train_score = np.std(train_scores)
+std_val_score = np.std(val_scores)
+
+print("Mean training score:", mean_train_score)
+print("Mean validation score:", mean_val_score)
+print("Training score standard deviation:", std_train_score)
+print("Validation score standard deviation:", std_val_score)
