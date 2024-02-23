@@ -1,0 +1,36 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+
+dataset = pd.read_csv("/content/breastcancer.csv")
+
+X = dataset.iloc[:, :-1].values
+y = dataset.iloc[:, -1].values
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+random_forest_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
+random_forest_classifier.fit(X_train_scaled, y_train)
+
+y_pred_rf = random_forest_classifier.predict(X_test_scaled)
+
+accuracy_rf = accuracy_score(y_test, y_pred_rf)
+print("Random Forest Accuracy:", accuracy_rf)
+
+conf_matrix_rf = confusion_matrix(y_test, y_pred_rf)
+print("Confusion Matrix for Random Forest:")
+print(conf_matrix_rf)
+
+sns.heatmap(conf_matrix_rf, annot=True, fmt='d', cmap='Blues', xticklabels=dataset.iloc[:, -1].unique(), yticklabels=dataset.iloc[:, -1].unique())
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.title("Confusion Matrix for Random Forest")
+plt.show()
