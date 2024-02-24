@@ -1,0 +1,58 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + 1.5 * X**2 + np.random.randn(100, 1)
+
+def calculate_loss(X, y, theta):
+    m = len(y)
+    predictions = X.dot(theta)
+    loss = (1 / (2 * m)) * np.sum((predictions - y)**2)
+    return loss
+
+def gradient_descent(X, y, theta, learning_rate, iterations, stopping_threshold):
+    m = len(y)
+    loss_history = []
+
+    for i in range(iterations):
+        predictions = X.dot(theta)
+        errors = predictions - y
+        gradient = (1 / m) * X.T.dot(errors)
+        theta = theta - learning_rate * gradient
+
+        current_loss = calculate_loss(X, y, theta)
+        loss_history.append(current_loss)
+
+        if i > 0 and (loss_history[i - 1] - current_loss) < stopping_threshold:
+            break
+
+    return theta, loss_history
+
+X_b = np.c_[np.ones((100, 1)), X, X**2]
+
+theta_initial = np.random.randn(3, 1)
+
+learning_rate = 0.01
+iterations = 1000
+stopping_threshold = 1e-6
+
+theta_optimal, loss_history = gradient_descent(X_b, y, theta_initial, learning_rate, iterations, stopping_threshold)
+
+print("Optimal Parameters (Theta):", theta_optimal)
+
+plt.scatter(X, y)
+x_values = np.linspace(0, 2, 100)
+X_values_b = np.c_[np.ones((100, 1)), x_values, x_values**2]
+plt.plot(x_values, X_values_b.dot(theta_optimal), color='red', label='Quadratic Regression')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.legend()
+plt.title('Gradient Descent Quadratic Regression')
+plt.show()
+
+plt.plot(range(len(loss_history)), loss_history)
+plt.xlabel('Iterations')
+plt.ylabel('Mean Squared Error (Loss)')
+plt.title('Loss over Iterations')
+plt.show()
